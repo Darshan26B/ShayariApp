@@ -20,19 +20,17 @@ import java.util.List;
 public class ExternalDB extends SQLiteOpenHelper {
     Context context;
 
-   static final String DB_Name ="shayari.db";
-    String DB_path="";
-    public ExternalDB(@Nullable Context context) {
+    static final String DB_Name = "shayari.db";
+    String DB_path = "";
+
+    public ExternalDB(@Nullable Context context) throws IOException {
         super(context, "DB_Name", null, 1);
-        this. context =context;
+        this.context = context;
         DB_path = context.getApplicationInfo().dataDir + "/databases/";
 
         if (!isDataBaseExists()) {
-            try {
-                copyDataBase();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+            copyDataBase();
         }
     }
 
@@ -47,44 +45,43 @@ public class ExternalDB extends SQLiteOpenHelper {
 
     }
 
-    public boolean isDataBaseExists() {
+    private boolean isDataBaseExists() {
         File dbFile = new File(DB_path + DB_Name);
         return dbFile.exists();
     }
+
     private void copyDataBase() throws IOException {
+        try {
+            InputStream myInput = context.getAssets().open(DB_Name);
 
-        InputStream myInput = context.getAssets().open(DB_Name);
-
-        String outFileName = DB_path + DB_Name;
-
-
-       FileOutputStream OutputStream  = new FileOutputStream (outFileName);
-
-
-        byte[] buffer = new byte[8 * 1024];
-        int length;
-        while ((length = myInput.read(buffer)) != -1) {
-            OutputStream.write(buffer, 0, length);
+            FileOutputStream OutputStream = new FileOutputStream(DB_path + DB_Name);
+            byte[] buffer = new byte[8 * 1024];
+            int length;
+            while ((length = myInput.read(buffer)) != -1) {
+                OutputStream.write(buffer, 0, length);
+            }
+                OutputStream.flush();
+                OutputStream.close();
+                myInput.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
-        OutputStream.flush();
-        OutputStream.close();
-        myInput.close();
-
     }
-    public List<ShayariModel>getShayari(){
+
+    public List<ShayariModel> getShayari() {
         List<ShayariModel> modelList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT * FROM myShayari";
-        Cursor cursor = db.rawQuery(sql,null);
+        Cursor cursor = db.rawQuery(sql, null);
         cursor.moveToFirst();
 
-        for (int i = 0; i<cursor.getCount(); i++) {
+        for (int i = 0; i < cursor.getCount(); i++) {
             int id = cursor.getInt(0);
             String shayari = cursor.getString(1);
             String cat = cursor.getString(2);
-            ShayariModel model = new ShayariModel (id,shayari,cat);
+            ShayariModel model = new ShayariModel(id, shayari, cat);
             modelList.add(model);
             cursor.moveToNext();
         }
