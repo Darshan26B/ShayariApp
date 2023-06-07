@@ -5,11 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.darshan.shayariapp.databinding.RcvshayariBinding
+import java.util.ArrayList
 
 class shayariAdapter : Adapter<shayariAdapter.shayariHolder>() {
 
 
-
+    var shayariList= ArrayList<ShayariModel>()
 
     class shayariHolder(itemView: RcvshayariBinding) : ViewHolder(itemView.root) {
         var  binding = itemView
@@ -22,10 +23,18 @@ class shayariAdapter : Adapter<shayariAdapter.shayariHolder>() {
     }
 
     override fun getItemCount(): Int {
-
+        return shayariList.size
     }
 
     override fun onBindViewHolder(holder: shayariHolder, position: Int) {
+        holder.binding.apply {
+            shayariList.get(position).apply {
+                txtShayari.text =shayariList.toString()
+            }
+        }
+    }
 
+    fun setShayari(shayariList: ArrayList<ShayariModel>) {
+        this.shayariList=shayariList
     }
 }

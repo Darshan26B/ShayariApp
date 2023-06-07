@@ -20,15 +20,19 @@ import java.util.List;
 public class ExternalDB extends SQLiteOpenHelper {
     Context context;
 
-   static final String DB_Name ="shayari";
+   static final String DB_Name ="shayari.db";
     String DB_path="";
-    public ExternalDB(@Nullable Context context) throws IOException {
-        super(context, "Shayari-Name", null, 1);
+    public ExternalDB(@Nullable Context context) {
+        super(context, "DB_Name", null, 1);
         this. context =context;
         DB_path = context.getApplicationInfo().dataDir + "/databases/";
 
         if (!isDataBaseExists()) {
-            copyDataBase();
+            try {
+                copyDataBase();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -54,18 +58,18 @@ public class ExternalDB extends SQLiteOpenHelper {
         String outFileName = DB_path + DB_Name;
 
 
-        OutputStream myOutput = new FileOutputStream(outFileName);
+       FileOutputStream OutputStream  = new FileOutputStream (outFileName);
 
 
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[8 * 1024];
         int length;
-        while ((length = myInput.read(buffer)) > 0) {
-            myOutput.write(buffer, 0, length);
+        while ((length = myInput.read(buffer)) != -1) {
+            OutputStream.write(buffer, 0, length);
         }
 
 
-        myOutput.flush();
-        myOutput.close();
+        OutputStream.flush();
+        OutputStream.close();
         myInput.close();
 
     }
